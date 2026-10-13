@@ -1,4 +1,5 @@
 import pandas as pd
+from sklearn.linear_model import LinearRegression
 
 
 def prophet_forecast(df_monthly: pd.DataFrame, periods: int = 6):
@@ -118,5 +119,65 @@ def prophet_forecast(df_monthly: pd.DataFrame, periods: int = 6):
         ["ds", "yhat", "yhat_lower", "yhat_upper"]
     ].tail(periods)
 
+
+    return forecast, mae, accuracy
+
+def linear_regression_forecast(df_monthly: pd.DataFrame, periods: int = 6):
+    if df_monthly.empty:
+        return None, "No data", 0
+
+    data = df_monthly[["month", "revenue"]].copy()
+    data["month"] = pd.to_datetime(data["month"])
+    data = data.sort_values("month").reset_index(drop=True)
+
+    # Convert dates into numeric time steps
+    data["time"] = range(len(data))
+
+    # Keep the last 3 months for testing when enough data exists
+    if len(data) >= 9:
+        train = data.iloc[:-3]
+        test = data.iloc[-3:]
+
+        model = LinearRegression()
+        model.fit(train[["time"]], train["revenue"])
+
+        predicted = model.predict(test[["time"]])
+
+        mae = abs(test["revenue"].to_numpy() - predicted).mean()
+
+        actual = test["revenue"].to_numpy()
+        nonzero = actual != 0
+        if nonzero.any():
+            mape = (
+                abs((actual[nonzero] - predicted[nonzero]) / actual[nonzero]).mean()
+                * 100
+            )
+            accuracy = max(0, 100 - mape)
+        else:
+            accuracy = 0
+    else:
+        mae = 0
+        accuracy = 0
+
+    # Train the final model on all historical data
+    final_model = LinearRegression()
+    final_model.fit(data[["time"]], data["revenue"])
+
+    future_steps = list(range(len(data), len(data) + periods))
+    future_revenue = final_model.predict(
+        pd.DataFrame({"time": future_steps})
+    )
+
+    last_month = data["month"].max()
+    future_dates = pd.date_range(
+        start=last_month + pd.offsets.MonthBegin(1),
+        periods=periods,
+        freq="MS",
+    )
+
+    forecast = pd.DataFrame({
+        "ds": future_dates,
+        "yhat": future_revenue,
+    })
 
     return forecast, mae, accuracy

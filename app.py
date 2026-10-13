@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.express as px
 
 from dotenv import load_dotenv
-from marketiq.forecast import prophet_forecast
+from marketiq.forecast import prophet_forecast, linear_regression_forecast
 
 load_dotenv()
 
@@ -566,188 +566,184 @@ with col2:
     )
 
 
+
 # ==========================================
-# FORECAST
+# FORECAST MODEL COMPARISON
 # ==========================================
 
-st.header(
-    "🔮 Forecasts"
+st.header("🔮 Sales Forecasting Model Comparison")
+
+forecast_data = monthly[["month", "revenue"]].copy()
+
+# Run both models
+prophet_fc, prophet_mae, prophet_accuracy = prophet_forecast(
+    forecast_data.copy(),
+    periods=6
+)
+fc = prophet_fc
+linear_fc, linear_mae, linear_accuracy = linear_regression_forecast(
+    forecast_data.copy(),
+    periods=6
 )
 
-
-fc, mae, accuracy = prophet_forecast(
-    monthly[
-        [
-            "month",
-            "revenue"
-        ]
-    ]
+# Check whether forecasts were generated successfully
+prophet_ok = (
+    prophet_fc is not None
+    and not prophet_fc.empty
+    and not isinstance(prophet_mae, str)
 )
 
+linear_ok = (
+    linear_fc is not None
+    and not linear_fc.empty
+    and not isinstance(linear_mae, str)
+)
 
-if isinstance(mae, str):
-
-    st.warning(
-        f"Forecast unavailable: {mae}"
-    )
-
+if not prophet_ok and not linear_ok:
+    st.warning("Both forecasting models are unavailable.")
 else:
+    # ======================================
+    # MODEL EVALUATION
+    # ======================================
+
+    st.subheader("Model Evaluation")
 
     col1, col2 = st.columns(2)
 
-
     with col1:
+        st.markdown("### Prophet")
 
-        st.success(
-            f"Model Evaluation — MAE: ₹{mae:,.0f}"
-        )
-
+        if prophet_ok:
+            st.metric("MAE", f"₹{prophet_mae:,.2f}")
+            st.metric(
+                "MAPE-based score",
+                f"{prophet_accuracy:.1f}%"
+            )
+        else:
+            st.warning(f"Prophet unavailable: {prophet_mae}")
 
     with col2:
+        st.markdown("### Linear Regression")
 
-        st.success(
-            f"Forecast Accuracy: {accuracy:.1f}%"
+        if linear_ok:
+            st.metric("MAE", f"₹{linear_mae:,.2f}")
+            st.metric(
+                "MAPE-based score",
+                f"{linear_accuracy:.1f}%"
+            )
+        else:
+            st.warning(f"Linear Regression unavailable: {linear_mae}")
+
+    # ======================================
+    # FORECAST COMPARISON TABLE
+    # ======================================
+
+    st.subheader("Next 6 Months: Forecast Comparison")
+
+    comparison = None
+
+    if prophet_ok and linear_ok:
+        comparison = prophet_fc[["ds", "yhat"]].merge(
+            linear_fc[["ds", "yhat"]],
+            on="ds",
+            suffixes=("_Prophet", "_LinearRegression")
         )
 
-
-    # ======================================
-    # FORECAST TABLE
-    # ======================================
-
-    st.subheader(
-        "Future Revenue Forecast"
-    )
-
-
-    forecast_table = fc.copy()
-
-
-    forecast_table = forecast_table.rename(
-        columns={
-            "ds": "Forecast Date",
-            "yhat": "Predicted Revenue",
-            "yhat_lower": "Lower Estimate",
-            "yhat_upper": "Upper Estimate"
-        }
-    )
-
-
-    forecast_table["Forecast Date"] = (
-        pd.to_datetime(
-            forecast_table["Forecast Date"]
-        ).dt.strftime(
-            "%d %b %Y"
+        comparison = comparison.rename(
+            columns={
+                "ds": "Forecast Date",
+                "yhat_Prophet": "Prophet Prediction",
+                "yhat_LinearRegression": "Linear Regression Prediction"
+            }
         )
-    )
 
+        comparison["Forecast Date"] = pd.to_datetime(
+            comparison["Forecast Date"]
+        ).dt.strftime("%d %b %Y")
 
-    forecast_table["Predicted Revenue"] = (
-        forecast_table["Predicted Revenue"]
-        .round(0)
-        .astype(int)
-    )
+        comparison["Prophet Prediction"] = (
+            comparison["Prophet Prediction"].round(2)
+        )
 
+        comparison["Linear Regression Prediction"] = (
+            comparison["Linear Regression Prediction"].round(2)
+        )
 
-    forecast_table["Lower Estimate"] = (
-        forecast_table["Lower Estimate"]
-        .round(0)
-        .astype(int)
-    )
+        st.dataframe(
+            comparison,
+            use_container_width=True,
+            hide_index=True
+        )
 
+        # ======================================
+        # FUTURE FORECAST GRAPH
+        # ======================================
 
-    forecast_table["Upper Estimate"] = (
-        forecast_table["Upper Estimate"]
-        .round(0)
-        .astype(int)
-    )
+        prophet_plot = prophet_fc[["ds", "yhat"]].copy()
+        prophet_plot["Model"] = "Prophet"
 
+        linear_plot = linear_fc[["ds", "yhat"]].copy()
+        linear_plot["Model"] = "Linear Regression"
 
-    st.dataframe(
-        forecast_table,
-        use_container_width=True,
-        hide_index=True
-    )
+        prophet_plot = prophet_plot.rename(
+            columns={"ds": "Date", "yhat": "Predicted Revenue"}
+        )
 
+        linear_plot = linear_plot.rename(
+            columns={"ds": "Date", "yhat": "Predicted Revenue"}
+        )
 
-    # ======================================
-    # HISTORICAL + FUTURE FORECAST GRAPH
-    # ======================================
+        future_comparison = pd.concat(
+            [prophet_plot, linear_plot],
+            ignore_index=True
+        )
 
-    history_chart = monthly[
-        [
-            "month",
-            "revenue"
-        ]
-    ].copy()
+        forecast_graph = px.line(
+            future_comparison,
+            x="Date",
+            y="Predicted Revenue",
+            color="Model",
+            markers=True,
+            title="Prophet vs Linear Regression: Future Revenue"
+        )
 
+        forecast_graph.update_layout(
+            yaxis_tickprefix="₹",
+            hovermode="x unified"
+        )
 
-    history_chart = history_chart.rename(
-        columns={
-            "month": "Date",
-            "revenue": "Revenue"
-        }
-    )
+        st.plotly_chart(
+            forecast_graph,
+            use_container_width=True
+        )
 
+        # ======================================
+        # SIMPLE RESULT SUMMARY
+        # ======================================
 
-    future_chart = fc[
-        [
-            "ds",
-            "yhat"
-        ]
-    ].copy()
+        st.subheader("Comparison Summary")
 
+        if prophet_mae < linear_mae:
+            st.info(
+                "Prophet has the lower MAE on the test period."
+            )
+        elif linear_mae < prophet_mae:
+            st.info(
+                "Linear Regression has the lower MAE on the test period."
+            )
+        else:
+            st.info("Both models have the same MAE.")
 
-    future_chart = future_chart.rename(
-        columns={
-            "ds": "Date",
-            "yhat": "Revenue"
-        }
-    )
+        st.caption(
+            "Lower MAE means lower average absolute prediction error. "
+            "The MAPE-based score is a derived score, not a guarantee "
+            "of future forecasting accuracy."
+        )
 
-
-    history_chart["Type"] = (
-        "Historical Revenue"
-    )
-
-    future_chart["Type"] = (
-        "Predicted Revenue"
-    )
-
-
-    combined_chart = pd.concat(
-        [
-            history_chart,
-            future_chart
-        ],
-        ignore_index=True
-    )
-
-
-    forecast_graph = px.line(
-        combined_chart,
-        x="Date",
-        y="Revenue",
-        color="Type",
-        markers=True,
-        labels={
-            "Date": "Date",
-            "Revenue": "Revenue",
-            "Type": "Data Type"
-        }
-    )
-
-
-    forecast_graph.update_layout(
-        title="Historical Revenue vs Future Forecast",
-        yaxis_tickprefix="₹",
-        hovermode="x unified"
-    )
-
-
-    st.plotly_chart(
-        forecast_graph,
-        use_container_width=True
-    )
+    elif prophet_ok:
+        st.info("Only Prophet produced a forecast.")
+    elif linear_ok:
+        st.info("Only Linear Regression produced a forecast.")
 
 
 # ==========================================
