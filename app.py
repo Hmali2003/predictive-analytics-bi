@@ -43,56 +43,124 @@ uploaded_file = st.sidebar.file_uploader(
 )
 
 
+
 # ==========================================
 # HOME PAGE
 # ==========================================
 
 if uploaded_file is None or st.session_state["show_home"]:
 
-    st.title(
-        "📊 Predictive Analytics in Business Intelligence"
-    )
+    st.markdown("""
+        <style>
+        .welcome-banner {
+            padding: 36px 30px;
+            border-radius: 18px;
+            background: linear-gradient(120deg, #102a43, #176b87);
+            color: white;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .welcome-banner h1 {
+            color: white;
+            font-size: 36px;
+            margin-bottom: 12px;
+        }
+        .welcome-banner p {
+            color: #e5f4ff;
+            font-size: 17px;
+        }
+        .feature-card {
+            background: #f3f7fb;
+            border: 1px solid #dce6ef;
+            border-radius: 12px;
+            padding: 18px;
+            min-height: 145px;
+        }
+        .feature-card h3 {
+            color: #174a6e;
+            font-size: 19px;
+        }
+        .feature-card p {
+            color: #334155;
+            font-size: 15px;
+        }
+        </style>
 
-    st.subheader(
-        "Sales Forecasting and Business Intelligence System"
-    )
+        <div class="welcome-banner">
+            <h1>📊 Predictive Analytics in Business Intelligence</h1>
+            <p>Sales Analysis • Revenue Forecasting • Data-Driven Insights</p>
+            <p>Turn historical sales data into meaningful business decisions.</p>
+        </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown("### Welcome to Your Business Intelligence System")
 
     st.write(
-        "This system analyzes historical sales data and predicts "
-        "future revenue using predictive analytics."
+        "Explore historical sales performance, understand customer and "
+        "product trends, and compare two models that forecast future revenue."
     )
 
-    st.info(
-        """
-        ### 📌 How to Use This System
+    col1, col2, col3 = st.columns(3)
 
-        1. Prepare your sales data in CSV format.
-        2. Upload the CSV using the sidebar.
-        3. The system will validate and process your data.
-        4. If the data is valid, the dashboard will be displayed.
-        5. If there is a data problem, instructions will be shown.
+    with col1:
+        st.markdown("""
+            <div class="feature-card">
+                <h3>📈 Sales Analytics</h3>
+                <p>Explore revenue trends, orders, customers and sales channels.</p>
+            </div>
+        """, unsafe_allow_html=True)
 
-        ### 📋 Required CSV Columns
+    with col2:
+        st.markdown("""
+            <div class="feature-card">
+                <h3>🔮 Revenue Forecasting</h3>
+                <p>Compare Prophet and Linear Regression predictions.</p>
+            </div>
+        """, unsafe_allow_html=True)
 
-        - `date`
-        - `revenue`
-        - `order_id`
-        - `customer_id`
-        - `sales_channel`
-        - `product`
-        """
+    with col3:
+        st.markdown("""
+            <div class="feature-card">
+                <h3>💡 Business Insights</h3>
+                <p>Identify top products, leading channels and revenue trends.</p>
+            </div>
+        """, unsafe_allow_html=True)
+
+    st.markdown("---")
+
+    st.markdown("### 🚀 Get Started")
+
+    st.write(
+        "Upload your sales CSV using the sidebar to begin. "
+        "Once your file is uploaded, open the dashboard below."
     )
 
-    st.warning(
-        "📤 Please upload a CSV file from the sidebar to view the dashboard."
+    st.caption(
+        "Required columns: date, revenue, order_id, customer_id, "
+        "sales_channel, product"
     )
 
-    # If user uploads a file from home page
     if uploaded_file is not None:
-        st.session_state["show_home"] = False
-        st.rerun()
+        if st.button("📊 Open Dashboard", type="primary",
+                     use_container_width=True):
+            st.session_state["show_home"] = False
+            st.rerun()
+    else:
+     st.info("👈 Upload your sales CSV using the sidebar to continue.")
 
     st.stop()
+
+    st.markdown("---")
+
+    st.markdown(
+        """
+        <div style="text-align:center; color:#64748b; padding:12px 0;">
+            Developed by <strong>Harshal Mali</strong> | © 2026
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
 
 
 # ==========================================
@@ -859,3 +927,16 @@ if fc is not None and not fc.empty:
         f"₹{forecast_revenue:,.0f} revenue over the next "
         f"{len(fc)} months."
     )
+
+    
+
+# Footer
+st.markdown("---")
+st.markdown(
+    """
+    <div style="text-align:center; color:#64748b; padding:12px 0;">
+        Developed by <strong>Harshal Mali</strong> | © 2026
+    </div>
+    """,
+    unsafe_allow_html=True
+)
