@@ -33,6 +33,18 @@ def donut_share(df):
     return fig
 
 def bar_top(df):
-    fig = px.bar(df, x='revenue', y='product_id', orientation='h')
-    fig.update_layout(height=480, margin=dict(t=30,r=10,l=10,b=10), yaxis={'categoryorder':'total ascending'})
+
+    fig = px.bar(
+        df,
+        x='revenue',
+        y='product_name',
+        orientation='h'
+    )
+
+    fig.update_layout(
+        height=480,
+        margin=dict(t=30, r=10, l=10, b=10),
+        yaxis={'categoryorder': 'total ascending'}
+    )
+
     return fig
