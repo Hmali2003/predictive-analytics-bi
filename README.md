@@ -1,226 +1,181 @@
-# MarketIQ, Real-Time Sales & Forecasting Dashboard
+# Predictive Analytics-Based Business Intelligence System for Sales Forecasting
 
-**MarketIQ** is a full-featured **Streamlit-powered analytics platform** that integrates **SQL-driven data pipelines**, **interactive visualization**, and **AI-powered forecasting**.  
-It empowers analysts, startups, and data teams to turn raw data into actionable business insights, in real-time.
-
----
+**Developed by:** Harshal Mali  
+**Course:** Master of Computer Applications (MCA)  
+**Project Domain:** Predictive Analytics in Business Intelligence
 
 ## Project Overview
 
-MarketIQ provides a **data storytelling environment** for operational analytics, business intelligence, and forecasting.  
-It connects seamlessly to SQL databases, allowing users to explore KPIs like revenue, orders, and customer engagement dynamically.  
-With built-in **Prophet forecasting**, it projects future trends based on historical sales.
+The Predictive Analytics-Based Business Intelligence System for Sales Forecasting is a Python-based web application that analyzes historical sales data, visualizes business performance, and predicts future revenue.
 
-This system simulates what modern analytics teams need: real-time querying, rapid visualization, and human-readable insights.
+The system combines Business Intelligence (BI) and Predictive Analytics to help users understand sales trends and make data-driven business decisions.
 
----
+Users can upload a sales dataset in CSV format and explore interactive dashboards, business metrics, and six-month revenue forecasts.
 
-## Architecture Overview
+## Objectives
 
-```mermaid
-flowchart LR
-A["SQL Database"] --> B["ETL & Preprocessing (Pandas + SQLAlchemy)"]
-B --> C["Streamlit Interface"]
-C --> D["Analytics Engine (Plotly KPIs)"]
-D --> E["Forecasting Engine (Prophet)"]
-E --> F["Dashboard Visualization & Reports"]
-F --> G["Export: CSV & Charts"]
-```
-This modular architecture promotes extensibility, allowing users to integrate new models, connect external databases (PostgreSQL, Supabase), or automate reporting pipelines.
-
----
-
-## Technology Stack
-
-| Layer | Technology | Purpose |
-|-------|-------------|----------|
-| **Frontend** | Streamlit | Interactive UI and visualization |
-| **Database Layer** | SQLite (default) / PostgreSQL-ready | Centralized analytics data |
-| **Data Processing** | Pandas + SQLAlchemy | Query execution and data transformations |
-| **Visualization** | Plotly Express | Dynamic charts and interactive KPIs |
-| **Forecasting** | Prophet (optional) | Predictive time-series analysis |
-| **Language** | Python 3.10+ | Core application logic |
-
----
+- Analyze historical sales data.
+- Display key business performance indicators.
+- Visualize monthly revenue trends and sales performance.
+- Identify top-performing products and sales channels.
+- Predict future revenue using time-series forecasting.
+- Evaluate forecasting performance using MAE and MAPE-derived accuracy.
 
 ## Features
 
-**SQL-powered Metrics:** Directly query and visualize your database.  
-**KPI Dashboard:** Revenue, Orders, Customers, AOV, and MoM trends.  
-**Forecast Module:** Prophet predicts future sales with confidence intervals.  
-**Multi-view Charts:** Line, Bar, and Donut charts with Plotly.  
-**Real-Time Filters:** Date range filters update every chart dynamically.  
-**Export Tools:** Save results as CSV or images for reports.  
-**Extendable System:** Add new SQL models or ML forecasts easily.
+### 1. CSV Upload and Validation
+- Upload sales datasets in CSV format.
+- Validate the required columns.
+- Display clear error messages for missing columns or invalid data.
 
----
+### 2. Data Cleaning
+- Convert date and revenue fields into appropriate formats.
+- Remove records with invalid dates or revenue values.
 
-## Project Structure
+### 3. Business Intelligence Dashboard
+The dashboard displays:
+- Total Revenue
+- Total Orders
+- Unique Customers
+- Average Order Value (AOV)
+- Month-over-Month (MoM) Revenue Change
 
+### 4. Interactive Visualizations
+- Monthly Revenue Trend
+- Sales by Channel
+- Top Products by Revenue
+
+### 5. Predictive Revenue Forecasting
+The system uses the Prophet time-series forecasting model to predict revenue for the next six months. It also displays predicted values and forecast ranges.
+
+### 6. Model Evaluation
+- Mean Absolute Error (MAE)
+- MAPE-derived forecast accuracy
+
+The evaluation compares predictions with held-out historical observations. Forecasts are estimates and may differ from actual future revenue.
+
+### 7. Business Insights
+The dashboard summarizes revenue trends, the leading sales channel, the top product, and predicted future revenue.
+
+## Technology Stack
+
+| Technology | Purpose |
+|---|---|
+| Python | Main programming language |
+| Streamlit | Web application and dashboard |
+| Pandas | Data processing and cleaning |
+| Plotly | Interactive charts |
+| Prophet | Revenue forecasting |
+| Scikit-learn | Machine learning utilities |
+| SQLAlchemy | Database-related functionality |
+| python-dotenv | Environment configuration |
+
+## System Workflow
+
+```text
+Sales Dataset (CSV)
+        ↓
+Data Validation and Cleaning
+        ↓
+Sales Analysis
+        ↓
+Interactive BI Dashboard
+        ↓
+Prophet Forecasting Model
+        ↓
+Model Evaluation
+        ↓
+Business Insights and Future Revenue Forecast
 ```
-marketiq/
-├── app.py                  # Streamlit app logic
-├── marketiq/               # Core Python package
-│   ├── db.py               # SQLAlchemy connection + query layer
-│   ├── queries.py          # SQL queries for KPI, channels, products
-│   ├── charts.py           # Plotly charting utilities
-│   ├── forecast.py         # Prophet forecasting
-├── marketiq.db             # Preloaded SQLite database
-└── requirements.txt        # Dependencies
 
+## Required CSV Format
+
+The uploaded CSV must contain these six columns:
+
+| Column | Description |
+|---|---|
+| `date` | Date of the sale |
+| `revenue` | Revenue generated |
+| `order_id` | Unique order identifier |
+| `customer_id` | Customer identifier |
+| `sales_channel` | Channel through which the sale occurred |
+| `product` | Product name |
+
+Example:
+
+```csv
+date,revenue,order_id,customer_id,sales_channel,product
+2025-01-01,50000,ORD001,CUST001,Online,Laptop
+2025-02-01,65000,ORD002,CUST002,Store,Mobile
+2025-03-01,70000,ORD003,CUST003,Online,Tablet
 ```
 
----
+## Installation and Setup
 
-## Setup & Installation
+### Prerequisites
+- Python 3.11 or a compatible Python version
+- Git
+- pip
+
+### 1. Clone the Repository
 
 ```bash
-# Clone the repo
-git clone https://github.com/AmirhosseinHonardoust/MarketIQ.git
-cd MarketIQ
+git clone https://github.com/Hmali2003/predictive-analytics-bi.git
+cd predictive-analytics-bi
+```
 
-# Install dependencies
+### 2. Install Dependencies
+
+```bash
 pip install -r requirements.txt
+```
 
-# (Optional) Enable Prophet forecasting
-pip install prophet pystan==2.19.1.1
+### 3. Run the Application
 
-# Launch the dashboard
+```bash
 streamlit run app.py
 ```
 
----
+Open the local URL displayed in the terminal, usually:
 
-## Visual Walkthrough
+`http://localhost:8501`
 
-### 1. Dashboard Overview
-<img width="1265" height="620" alt="Screenshot 2025-11-05 at 15-44-35 MarketIQ — Real-Time Sales   Forecasting" src="https://github.com/user-attachments/assets/22d954b9-d8fb-45b5-abd0-b919b029d905" />
+## Model Evaluation
 
-**Description:**  
-This is the main interface of MarketIQ. It includes global KPIs, dynamic charts, and real-time filters for start and end date selection.
+The system uses historical data to train the forecasting model and reserves the last three months for evaluation when sufficient monthly observations are available.
 
-**Insight:**  
-Analysts can view key performance metrics at a glance, revenue, orders, customer base, and AOV, without running manual queries.
+- **MAE:** Measures the average absolute difference between actual and predicted revenue.
+- **MAPE:** Measures the average absolute prediction error as a percentage of actual revenue.
 
-**Technical Note:**  
-KPIs are aggregated from `v_sales_monthly` view via SQLAlchemy and rendered dynamically with Streamlit metric components.
+The displayed forecast accuracy is calculated as `100 − MAPE`, with negative values limited to zero. It is a derived indicator, not a guarantee of future prediction performance.
 
----
+## Project Limitations
 
-### 2. Revenue & Orders Over Time
-<img width="557" height="360" alt="newplot(20)" src="https://github.com/user-attachments/assets/11f8c1ca-d9ef-4d72-8082-aaa9a3880598" />
-
-**Description:**  
-This line chart visualizes **revenue and orders** per month, showcasing sales trends over time.
-
-**Insight:**  
-Peaks correspond to strong seasonal demand, while dips reflect slower periods, useful for marketing and operations forecasting.
-
-**Technical Note:**  
-Computed via SQL aggregation, transformed with Pandas, and rendered using Plotly Express `px.line()` with `markers=True` for trend clarity.
-
----
-
-### 3. Channel Revenue Distribution
-<img width="368" height="360" alt="newplot(21)" src="https://github.com/user-attachments/assets/7cb7c905-8379-4166-b895-75ea846f6713" />
-
-**Description:**  
-This donut chart shows the proportion of total revenue contributed by each sales channel (Web, Mobile, Retail, Marketplace).
-
-**Insight:**  
-Reveals channel dependency, if “Web” dominates, the business might diversify into app or retail strategies.
-
-**Technical Note:**  
-Query from `v_sales` grouped by `channel_name`; rendered with `px.pie(..., hole=0.5)` for donut-style view.
-
----
-
-### 4. Top Products by Revenue
-<img width="942" height="480" alt="newplot(22)" src="https://github.com/user-attachments/assets/fc7bf1a5-d31b-4cbd-8976-c1a5a8d03fc4" />
-
-**Description:**  
-A horizontal bar chart ranking top-performing products by revenue.
-
-**Insight:**  
-Identifies which SKUs or categories drive the majority of sales, a key tool for inventory planning and marketing.
-
-**Technical Note:**  
-Top 15 rows fetched via SQL query ordered by `SUM(revenue)`; plotted using Plotly’s `px.bar()` with orientation='h'.
-
----
-
-### 5. Forecast Section
-
-**Description:**  
-Displays Prophet-based forecasts for upcoming months based on historical revenue data.
-
-**Insight:**  
-Provides predictive foresight into potential sales outcomes, helping teams allocate budgets or prepare inventory.
-
-**Technical Note:**  
-Uses Prophet’s additive model for trend + seasonality. The `make_future_dataframe(periods=6, freq='MS')` generates 6-month forecasts with upper/lower confidence bounds.
-
----
-
-## Data Model (SQL Schema)
-
-MarketIQ’s SQL schema follows a **star model**, with one fact table (`fact_sales`) and supporting dimensions.  
-
-| Table | Purpose |
-|--------|----------|
-| **dim_date** | Stores calendar metadata (month, year, week) |
-| **dim_product** | Catalog of products with category hierarchy |
-| **dim_customer** | Customer attributes for segmentation |
-| **dim_channel** | Sales channels (web, app, retail) |
-| **fact_sales** | Central transactional table (quantities, prices, revenue) |
-
-Two SQL **views** simplify analytics:
-- `v_sales` joins all dimensions → detailed transactional reporting  
-- `v_sales_monthly` aggregates customer revenue by month → KPI-ready dataset  
-
----
-
-## KPI Logic
-
-| Metric | Formula | Description |
-|--------|----------|--------------|
-| **Revenue** | `SUM(quantity * price * (1 - discount/100))` | Total sales revenue |
-| **Orders** | `COUNT(sale_id)` | Number of transactions |
-| **Customers** | `COUNT(DISTINCT customer_id)` | Active customers in period |
-| **AOV** | `AVG(revenue / orders)` | Average Order Value |
-| **MoM Growth** | `(Current - Previous) / Previous * 100` | Month-over-Month growth |
-
----
-
-## Forecasting Engine (Prophet)
-
-MarketIQ integrates **Prophet** for interpretable, scalable time-series forecasting.
-
-- **Trend Component:** Captures long-term revenue trajectory.  
-- **Seasonality Component:** Adjusts for monthly and yearly patterns.  
-- **Confidence Intervals:** Upper/lower bounds reflect uncertainty.  
-
-If Prophet is not installed, MarketIQ gracefully disables forecasting but remains fully functional for SQL-driven analytics.
-
----
-
-## Exports
-
-All generated insights can be saved as CSV or PNG for sharing or archiving.
-
-Example:
-```
-export/2025-11-05T12-14_export.csv
-```
-
-This file includes all filtered KPI data and model results used in the dashboard at that timestamp.
-
----
+- The current input format requires all six specified CSV columns.
+- Forecast quality depends on the quality, length, and patterns of the uploaded sales data.
+- Future revenue predictions are estimates, not guaranteed results.
+- The application currently focuses on revenue forecasting rather than forecasting every business metric.
 
 ## Future Enhancements
 
-- **RFM & Cohort Analysis:** Customer segmentation for retention tracking.  
-- **Anomaly Detection:** ML-based detection of irregular revenue spikes.  
-- **Multi-DB Support:** PostgreSQL, Supabase, or DuckDB for scalability.  
-- **Automated PDF Reporting:** Generate shareable analytics reports.  
-- **Interactive SQL Editor:** Run ad-hoc queries directly in Streamlit.  
+- Support Excel file uploads.
+- Compare multiple forecasting models.
+- Add more advanced business analytics.
+- Introduce interactive what-if analysis.
+- Generate downloadable business reports.
+
+## Project Background and Attribution
+
+This project was developed for MCA academic research in the domain of Predictive Analytics in Business Intelligence. It adapts and extends the open-source Market-IQ project with changes for CSV-based sales analysis, data validation, dashboard functionality, forecasting evaluation, and business insights.
+
+Original project: https://github.com/AmirhosseinHonardoust/Market-IQ
+
+The original project's applicable license and copyright notice are retained in the `LICENSE` file.
+
+## Author
+
+**Harshal Mali**  
+Master of Computer Applications (MCA)  
+Project: Predictive Analytics-Based Business Intelligence System for Sales Forecasting
+
+GitHub: https://github.com/Hmali2003
